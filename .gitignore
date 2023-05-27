@@ -100,3 +100,5 @@ lint/tmp/
 .externalNativeBuild/
 release/
 .idea/
+*/src/androidTest
+*/src/test
