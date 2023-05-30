@@ -1,12 +1,15 @@
 package com.nnsman.firebase
 
+import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.ml.common.modeldownload.FirebaseModelDownloadConditions
 import com.google.firebase.ml.common.modeldownload.FirebaseModelManager
@@ -21,8 +24,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-       val mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
-        mSpeechRecognizer.setRecognitionListener(object :RecognitionListener{
+        val mSpeechRecognizer = SpeechRecognizer.createSpeechRecognizer(this);
+        mSpeechRecognizer.setRecognitionListener(object : RecognitionListener {
             override fun onReadyForSpeech(params: Bundle?) {
                 Log.d("kugbwqugrqi", "onReadyForSpeech:  $params")
             }
@@ -73,27 +76,27 @@ class MainActivity : AppCompatActivity() {
         });
 
         findViewById<Button>(R.id.button).setOnClickListener {
-           val a = SpeechRecognizer.isRecognitionAvailable(this)
-            Log.d("kugbwqugrqi", "isRecognitionAvailable:  $a")
+//           val a = SpeechRecognizer.isRecognitionAvailable(this)
+//            Log.d("kugbwqugrqi", "isRecognitionAvailable:  $a")
+//
+//            // 启动服务需要一个 Intent
+//           val  mRecognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+//            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+//            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
+//            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
+//// mLocale 是一个语音种类，可以根据自己的需求去设置
+//            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.CHINA);
+//
+//// 开始语音识别 结果在 mSpeechRecognizer.setRecognitionListener(this);回调中
+//            mSpeechRecognizer.startListening(mRecognitionIntent);
 
-            // 启动服务需要一个 Intent
-           val  mRecognitionIntent = Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
-            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
-            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_PARTIAL_RESULTS, true);
-            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 3);
-// mLocale 是一个语音种类，可以根据自己的需求去设置
-            mRecognitionIntent.putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.CHINA);
-
-// 开始语音识别 结果在 mSpeechRecognizer.setRecognitionListener(this);回调中
-            mSpeechRecognizer.startListening(mRecognitionIntent);
-
-
+            c()
         }
         val local = Locale("uk")
 // 停止监听
 
         findViewById<Button>(R.id.button2).setOnClickListener {
-            mSpeechRecognizer.stopListening();
+            //mSpeechRecognizer.stopListening();
         }
 
 // 取消服务
@@ -140,22 +143,41 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    fun isNetworkConnected(context: Context?): Boolean {
+        if (context != null) {
+            val mConnectivityManager = context
+                .getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+            val mNetworkInfo = mConnectivityManager.activeNetworkInfo
+            if (mNetworkInfo != null) {
+                return mNetworkInfo.isAvailable
+            }
+        }
+        return false
+    }
+
     fun c() {
+
+        if(!isNetworkConnected(this)){
+            Toast.makeText(this,"当前没有网络连接,请先连接网络!",Toast.LENGTH_SHORT).show()
+            return
+        }
+
+
         val modelManager = FirebaseModelManager.getInstance()
         // Download the French model.
-        val frModel = FirebaseTranslateRemoteModel.Builder(FirebaseTranslateLanguage.AF).build()
+        val frModel = FirebaseTranslateRemoteModel.Builder(FirebaseTranslateLanguage.LT).build()
         val conditions = FirebaseModelDownloadConditions.Builder()
 //            .requireWifi()
             .build()
-        modelManager.download(frModel, conditions)
-            .addOnSuccessListener {
-                // Model downloaded.
-                Log.d("FirebaseModelManagerdownload", "下载成功: $it")
-            }
-            .addOnFailureListener {
-                // Error.
-                Log.d("FirebaseModelManagerdownload", "下载失败 :$it")
-            }
+        val task = modelManager.download(frModel, conditions)
+        task.addOnSuccessListener {
+            // Model downloaded.
+            Log.d("FirebaseModelManagerdownload", "下载成功: $it")
+        }.addOnFailureListener {
+            // Error.
+            Log.d("FirebaseModelManagerdownload", "下载失败 :$it")
+        }
+        task
     }
 
     fun d() {
