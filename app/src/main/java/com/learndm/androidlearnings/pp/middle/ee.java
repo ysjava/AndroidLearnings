@@ -11,6 +11,7 @@ import java.security.SecureRandom;
 import java.security.cert.X509Certificate;
 
 import javax.crypto.Cipher;
+import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import javax.net.ssl.SSLContext;
@@ -39,7 +40,7 @@ public class ee {
                 SecretKeySpec secretKeySpec = new SecretKeySpec(key, "AES");
                 byte[] enCodeFormat = secretKeySpec.getEncoded();
                 SecretKeySpec seckey = new SecretKeySpec(enCodeFormat, "AES");
-                Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+                Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
                 IvParameterSpec iv = new IvParameterSpec(key);
                 cipher.init(2, seckey, iv);
                 byte[] result = cipher.doFinal(data);

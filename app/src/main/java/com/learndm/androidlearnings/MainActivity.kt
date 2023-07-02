@@ -1,6 +1,7 @@
 package com.learndm.androidlearnings
 
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.os.Handler
 import android.util.Log
@@ -17,15 +18,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-      findViewById<Button>(R.id.button2).setOnClickListener {
-          //startActivity(Intent(this,BActivity::class.java))
-      }
+        findViewById<Button>(R.id.button2).setOnClickListener {
+            //startActivity(Intent(this,BActivity::class.java))
+        }
     }
 
 
     suspend fun test() = suspendCoroutine<Unit> {
 
     }
+
     override fun onResume() {
         super.onResume()
         Log.d("akmhvfjhq", "onResume: ${this::class.java.simpleName}")
