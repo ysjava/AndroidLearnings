@@ -5,12 +5,12 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.learndm.androidlearnings"
         minSdk 27
-        targetSdk 32
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -59,4 +59,5 @@ dependencies {
     implementation 'com.github.tamsiree.RxTool:RxPay:2.6.2'
 
     implementation 'com.quickbirdstudios:opencv:3.4.15'
+    implementation "androidx.activity:activity-ktx:1.6.1"
 }
