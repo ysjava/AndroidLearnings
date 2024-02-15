@@ -22,8 +22,7 @@ abstract class ADBase {
 
         val currentTime = System.currentTimeMillis()
         val isOutTime = currentTime - loadTime > cacheOutTime
-        if (isOutTime && loadTime != 0L) return false
-        if (isExistCache()) return false
+        if (!isOutTime && isExistCache()) return false
 
         return true
     }
