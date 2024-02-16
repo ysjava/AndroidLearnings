@@ -53,9 +53,9 @@ abstract class ActPermission : AppCompatActivity() {
 
     fun requestPermissions(
         permissions: Array<String>,
+        cannotPopped: (permissions: List<String>) -> Unit,
         gratedList: ((List<String>) -> Unit)? = null,
         deniedList: ((List<String>) -> Unit)? = null,
-        cannotPopped: (permissions: List<String>) -> Unit,
         result: (Boolean) -> Unit,
     ) {
         this.result = result
