@@ -3,19 +3,38 @@ package com.nnsman.yaz_pre
 import android.content.pm.PackageManager
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 
 abstract class ActPermission : AppCompatActivity() {
     private val requestPermissionsLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             var result = true
+            val grantedResults = mutableListOf<String>()
+            val deniedResults = mutableListOf<String>()
             it.forEach { entry ->
-                if (!entry.value) {
+                if (entry.value) {
+                    grantedResults.add(entry.key)
+                } else {
                     result = false
-                    return@forEach
+                    deniedResults.add(entry.key)
                 }
             }
-            callback.invoke(result, it)
+            if (deniedResults.isNotEmpty()) {
+                val cannotPoppedPermissionList = mutableListOf<String>()
+                deniedResults.forEach { pm ->
+                    val b = ActivityCompat.shouldShowRequestPermissionRationale(this, pm)
+                    if (!b) {
+                        cannotPoppedPermissionList.add(pm)
+                    }
+                }
+                if (cannotPoppedPermissionList.isNotEmpty()) {
+                    cannotPopped.invoke(cannotPoppedPermissionList)
+                }
+            }
+            result(result)
+            gratedList?.invoke(grantedResults)
+            deniedList?.invoke(deniedResults)
         }
 
     fun checkPermissions(permissions: Array<String>): Boolean {
@@ -27,13 +46,23 @@ abstract class ActPermission : AppCompatActivity() {
         return true
     }
 
-    private lateinit var callback: (result: Boolean, specific: Map<String, Boolean>) -> Unit
+    private lateinit var result: (Boolean) -> Unit
+    private lateinit var cannotPopped: (permissions: List<String>) -> Unit
+    private var gratedList: ((List<String>) -> Unit)? = null
+    private var deniedList: ((List<String>) -> Unit)? = null
+
     fun requestPermissions(
         permissions: Array<String>,
-        callback: (result: Boolean, specific: Map<String, Boolean>) -> Unit
+        gratedList: ((List<String>) -> Unit)? = null,
+        deniedList: ((List<String>) -> Unit)? = null,
+        cannotPopped: (permissions: List<String>) -> Unit,
+        result: (Boolean) -> Unit,
     ) {
-        this.callback = callback
+        this.result = result
+        this.cannotPopped = cannotPopped
+        this.gratedList = gratedList
+        this.deniedList = deniedList
+
         requestPermissionsLauncher.launch(permissions)
     }
-
 }
